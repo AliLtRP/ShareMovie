@@ -4,8 +4,8 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 export class AuthEntity implements UserModel {
   id: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   username: string;
 
   @IsEmail()

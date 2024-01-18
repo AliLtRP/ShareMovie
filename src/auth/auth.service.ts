@@ -1,18 +1,16 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindAuthDto } from './dto/find-auth.dto';
-import { HelpersService } from 'src/helpers/helpers.service';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  // create user
   async create(createAuthDto: CreateAuthDto): Promise<object> {
-    const { username, email } = createAuthDto;
-
-    return this.prismaService.user.create({
+    return await this.prismaService.user.create({
       data: createAuthDto,
     });
   }

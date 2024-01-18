@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -17,10 +19,13 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async createUser(@Body() createAuthDto: CreateAuthDto) {
-    await this.authService
-      .create(createAuthDto)
-      .then((res) => console.log(res));
+  async createUser(@Body() createAuthDto: CreateAuthDto): Promise<object> {
+    // create new user if its not already exist
+    try {
+      return await this.authService.create(createAuthDto);
+    } catch (e) {
+      throw new HttpException(e.meta, HttpStatus.CONFLICT);
+    }
   }
 
   @Post('login')
