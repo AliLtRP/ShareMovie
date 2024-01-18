@@ -13,30 +13,7 @@ export class AuthService {
     private readonly helpers: HelpersService,
   ) {}
 
-  async create(createAuthDto: CreateAuthDto): Promise<object> {
-    const { username, email, password } = createAuthDto;
-
-    await this.helpers
-      .isUserExist(username, email)
-      .then(() => {
-        throw new HttpException('User already exists', HttpStatus.CONFLICT);
-      })
-      .catch((e) => {
-        console.log(e);
-        return { msg: 'sdf' };
-      });
-
-    const salt: number = 10;
-
-    // try {
-    //   const hash = await bcrypt.hash(password, salt);
-    //   createAuthDto.password = hash;
-    // } catch (e) {
-    //   if (e.code === 'P2002') {
-    //     // Unique constraint error code in Prisma
-    //     throw new HttpException('User already exists', HttpStatus.CONFLICT);
-    //   }
-
+  async create(createAuthDto: CreateAuthDto) {
     return await this.prismaService.user.create({
       data: createAuthDto,
     });

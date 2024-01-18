@@ -6,27 +6,29 @@ import {
   Patch,
   Param,
   Delete,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { FindAuthDto } from './dto/find-auth.dto';
-import { HelpersService } from 'src/helpers/helpers.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly helpers: HelpersService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   async createUser(@Body() createAuthDto: CreateAuthDto) {
-    try {
-      return await this.authService.create(createAuthDto);
-    } catch (e) {
-      throw e;
-    }
+    return await this.authService
+      .create(createAuthDto)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new HttpException('Error creating user', HttpStatus.BAD_REQUEST);
+      });
   }
 
   @Post('login')
