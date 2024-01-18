@@ -3,18 +3,16 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindAuthDto } from './dto/find-auth.dto';
-import * as bcrypt from 'bcrypt';
 import { HelpersService } from 'src/helpers/helpers.service';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly helpers: HelpersService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createAuthDto: CreateAuthDto) {
-    return await this.prismaService.user.create({
+  async create(createAuthDto: CreateAuthDto): Promise<object> {
+    const { username, email } = createAuthDto;
+
+    return this.prismaService.user.create({
       data: createAuthDto,
     });
   }
@@ -22,10 +20,8 @@ export class AuthService {
   login(findAuthDto: FindAuthDto): object {
     const { username, email } = findAuthDto;
 
-    // find user base on it is email or username
     return this.prismaService.user.findFirst({
       where: {
-        // check for username or email
         OR: [{ username }, { email }],
       },
     });

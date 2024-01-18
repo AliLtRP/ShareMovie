@@ -1,4 +1,4 @@
 import { OmitType } from '@nestjs/mapped-types';
-import { LoginEntity } from '../entities/login.entity';
+import { AuthEntity } from '../entities/auth.entity';
 
-export class FindAuthDto extends OmitType(LoginEntity, ['id']) {}
+export class FindAuthDto extends OmitType(AuthEntity, ['id', 'name']) {}
