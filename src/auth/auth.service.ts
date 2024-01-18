@@ -12,10 +12,8 @@ export class AuthService {
     private readonly helpers: HelpersService,
   ) {}
 
-  async create(createAuthDto: CreateAuthDto): Promise<object> {
-    const { username, email } = createAuthDto;
-
-    return this.prismaService.user.create({
+  async create(createAuthDto: CreateAuthDto) {
+    return await this.prismaService.user.create({
       data: createAuthDto,
     });
   }
