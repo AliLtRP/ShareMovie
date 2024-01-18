@@ -1,10 +1,11 @@
 import { User as UserModel } from '@prisma/client';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class AuthEntity implements UserModel {
   id: string;
 
   @IsNotEmpty()
+  @IsString()
   username: string;
 
   @IsEmail()

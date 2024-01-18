@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindAuthDto } from './dto/find-auth.dto';
+import * as bcrypt from 'bcrypt';
 import { HelpersService } from 'src/helpers/helpers.service';
 
 @Injectable()
@@ -12,7 +13,30 @@ export class AuthService {
     private readonly helpers: HelpersService,
   ) {}
 
-  async create(createAuthDto: CreateAuthDto) {
+  async create(createAuthDto: CreateAuthDto): Promise<object> {
+    const { username, email, password } = createAuthDto;
+
+    await this.helpers
+      .isUserExist(username, email)
+      .then(() => {
+        throw new HttpException('User already exists', HttpStatus.CONFLICT);
+      })
+      .catch((e) => {
+        console.log(e);
+        return { msg: 'sdf' };
+      });
+
+    const salt: number = 10;
+
+    // try {
+    //   const hash = await bcrypt.hash(password, salt);
+    //   createAuthDto.password = hash;
+    // } catch (e) {
+    //   if (e.code === 'P2002') {
+    //     // Unique constraint error code in Prisma
+    //     throw new HttpException('User already exists', HttpStatus.CONFLICT);
+    //   }
+
     return await this.prismaService.user.create({
       data: createAuthDto,
     });
