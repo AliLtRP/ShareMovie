@@ -10,19 +10,20 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { FindAuthDto } from './dto/find-auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post('register')
   createUser(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto);
   }
 
-  @Post()
-  loginUser(@Body() createAuthDto: CreateAuthDto) {
-    return '';
+  @Post('login')
+  loginUser(@Body() findAuthDto: FindAuthDto) {
+    return this.authService.login(findAuthDto);
   }
 
   @Get()
