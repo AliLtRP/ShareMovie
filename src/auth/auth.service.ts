@@ -120,18 +120,35 @@ export class AuthService {
    * @param id id to get user
    * @returns user object
    */
-  async findOne(id: string): Promise<User> {
-    return this.prismaService.user.findUnique({
-      where: { id: id },
+  async findOne(findAuthDto: FindAuthDto): Promise<User> {
+    return this.prismaService.user.findFirst({
+      where: {
+        OR: [{ username: findAuthDto.username }, { email: findAuthDto.email }],
+      },
     });
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  /**
+   *
+   * @param id user id to get the user from db
+   * @param updateAuthDto dto that has the user info
+   * @returns user
+   */
+  async update(id: string, updateAuthDto: UpdateAuthDto): Promise<User> {
+    return await this.prismaService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        password: this.hashData(updateAuthDto.password),
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async remove(id: string): Promise<any> {
+    return await this.prismaService.user.delete({
+      where: { id: id },
+    });
   }
 
   /**

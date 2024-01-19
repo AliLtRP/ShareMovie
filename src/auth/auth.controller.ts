@@ -70,17 +70,27 @@ export class AuthController {
    */
   @UseGuards(AccessTokenGuard)
   @Get('find/user')
-  findOne(@GetCurrentUser('sub') userId: string): Promise<User> {
-    return this.authService.findOne(userId);
+  findOne(@Body() findAuthDto: FindAuthDto): Promise<User> {
+    return this.authService.findOne(findAuthDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
+  @UseGuards(AccessTokenGuard)
+  @Patch('update/user')
+  update(
+    @GetCurrentUser('sub') userId: string,
+    @Body() updateAuthDto: UpdateAuthDto,
+  ): Promise<User> {
+    return this.authService.update(userId, updateAuthDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  /**
+   *
+   * @param id
+   * @returns
+   */
+  @UseGuards(AccessTokenGuard)
+  @Delete('delete/user')
+  remove(@GetCurrentUser('sub') id: string) {
+    return this.authService.remove(id);
   }
 }
