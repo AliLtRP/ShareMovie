@@ -15,6 +15,7 @@ import { FindAuthDto } from './dto/find-auth.dto';
 import { Token } from './types/tokens.type';
 import { AccessTokenGuard, FreshTokenGuard } from './common/guards';
 import { GetCurrentUser } from './common/decorators';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -52,14 +53,25 @@ export class AuthController {
     return this.authService.refreshToken(userId, refreshToken);
   }
 
+  /**
+   *
+   * @returns all users in the db
+   */
+  @UseGuards(AccessTokenGuard)
   @Get()
-  findAll() {
+  findAll(): Promise<object[]> {
     return this.authService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
+  /**
+   *
+   * @param userId user id to get specific user
+   * @returns user
+   */
+  @UseGuards(AccessTokenGuard)
+  @Get('find/user')
+  findOne(@GetCurrentUser('sub') userId: string): Promise<User> {
+    return this.authService.findOne(userId);
   }
 
   @Patch(':id')

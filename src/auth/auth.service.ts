@@ -107,12 +107,23 @@ export class AuthService {
     }
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  /**
+   *
+   * @returns users array
+   */
+  async findAll(): Promise<User[]> {
+    return await this.prismaService.user.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  /**
+   *
+   * @param id id to get user
+   * @returns user object
+   */
+  async findOne(id: string): Promise<User> {
+    return this.prismaService.user.findUnique({
+      where: { id: id },
+    });
   }
 
   update(id: number, updateAuthDto: UpdateAuthDto) {
