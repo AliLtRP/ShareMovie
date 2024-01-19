@@ -16,6 +16,7 @@ model User {
   email    String  @unique()
   name     String?
   password String
+  hashedRt String // hashed refresh token
 }
 
 // model for users info
