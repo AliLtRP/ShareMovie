@@ -16,6 +16,7 @@ import { FindAuthDto } from './dto/find-auth.dto';
 import { Token } from './types/tokens.type';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { AccessTokenGuard, FreshTokenGuard } from './common/guards';
 
 @Controller('auth')
 export class AuthController {
@@ -32,14 +33,14 @@ export class AuthController {
     return this.authService.login(findAuthDto);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AccessTokenGuard)
   @Post('logout')
   logout(@Req() req: Request) {
     const user = req.user;
     return this.authService.logout(user['sub']);
   }
 
-  @UseGuards(AuthGuard('jwt-refresh'))
+  @UseGuards(FreshTokenGuard)
   @Post('refresh')
   refreshToken(@Req() req: Request) {
     const user = req.user;
