@@ -9,13 +9,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 dotenv.config();
 
 @Module({
-  imports: [
-    PrismaModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60m' },
-    }),
-  ],
+  imports: [PrismaModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [
     AuthService,

@@ -19,9 +19,13 @@ export class AuthService {
     // change user password with hashed password
     createAuthDto.password = this.hashData(createAuthDto.password);
 
-    return await this.prismaService.user.create({
+    const newUser = await this.prismaService.user.create({
       data: createAuthDto,
     });
+
+    const tokens = await this.genTokens(newUser.id, newUser.email);
+
+    return tokens;
   }
 
   // login user
@@ -80,5 +84,39 @@ export class AuthService {
   // generate hash password
   hashData(data: string) {
     return bcrypt.hashSync(data, 10);
+  }
+
+  // generate tokens
+  async genTokens(userId: string, email: string): Promise<Token> {
+    const [at, rt] = await Promise.all([
+      // access token
+      await this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: 'at-secret',
+          expiresIn: 60 * 15,
+        },
+      ),
+      // refresh token
+      await this.jwtService.signAsync(
+        {
+          sub: userId,
+          email,
+        },
+        {
+          secret: 'rt-secret', // secret that must match the same secret in the strategy
+          expiresIn: 60 * 60 * 24 * 7, //one week
+        },
+      ),
+    ]);
+
+    // return access and refresh token
+    return {
+      access_token: at,
+      refresh_token: rt,
+    };
   }
 }
