@@ -6,8 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -22,21 +20,17 @@ export class AuthController {
   @Post('register')
   async createUser(@Body() createAuthDto: CreateAuthDto): Promise<Token> {
     // create new user if its not already exist
-    try {
-      return await this.authService.create(createAuthDto);
-    } catch (e) {
-      throw new HttpException(e.meta, HttpStatus.CONFLICT);
-    }
+    return await this.authService.create(createAuthDto);
   }
 
   @Post('login')
-  loginUser(@Body() findAuthDto: FindAuthDto) {
+  loginUser(@Body() findAuthDto: FindAuthDto): Promise<Token> {
     return this.authService.login(findAuthDto);
   }
 
   @Post('logout')
-  logout() {
-    return this.authService.logout();
+  logout(@Body() findAuthDto: FindAuthDto) {
+    return this.authService.logout(findAuthDto);
   }
 
   @Post('refresh')

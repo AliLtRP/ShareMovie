@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -14,46 +19,59 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // create user
+  /**
+   *
+   * @param createAuthDto create dto has user data
+   * @returns tokens
+   */
   async create(createAuthDto: CreateAuthDto): Promise<Token> {
-    // change user password with hashed password
-    createAuthDto.password = this.hashData(createAuthDto.password);
+    try {
+      // change user password with hashed password
+      createAuthDto.password = this.hashData(createAuthDto.password);
 
-    const newUser = await this.prismaService.user.create({
-      data: createAuthDto,
-    });
+      const newUser = await this.prismaService.user.create({
+        data: createAuthDto,
+      });
 
-    // generate tokens
-    const tokens = await this.genTokens(newUser.id, newUser.email);
+      // generate tokens
+      const tokens = await this.genTokens(newUser.id, newUser.email);
 
-    // include token to the user model in the db
-    await this.updateRt(newUser.id, tokens.refresh_token);
-    return tokens;
+      // include token to the user model in the db
+      await this.updateRt(newUser.id, tokens.refresh_token);
+      return tokens;
+    } catch (e) {
+      throw new HttpException(e.meta, HttpStatus.CONFLICT);
+    }
   }
 
-  // login user
-  async login(findAuthDto: FindAuthDto): Promise<object> {
-    const { username, email, password } = findAuthDto;
-
+  /**
+   *
+   * @param findAuthDto Dto class that has the user data
+   * @returns tokens or throw error
+   */
+  async login(findAuthDto: FindAuthDto): Promise<Token> {
     try {
       const getUser: any = await this.findUser(findAuthDto);
-      const resolvePassword = await bcrypt.compare(password, getUser.password);
 
-      if (resolvePassword === true) {
-        // const payload: object = { sub: getUser.id, username: username };
+      // if the user exist, it will compare the hashed password in the database with the user password
+      const compareMatch = this.hashCompare(
+        findAuthDto.password,
+        getUser.password,
+      );
 
-        // const token = this.jwtService.sign(payload);
-        // return { accecc_token: token };
-        return getUser;
-      }
+      const tokens = await this.genTokens(getUser.id, getUser.email);
+
+      // include token to the user model in the db
+      await this.updateRt(getUser.id, tokens.refresh_token);
+      return tokens;
     } catch (e) {
       console.log(e);
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      throw e;
     }
   }
 
   // logout user
-  logout() {}
+  logout(findAuthDto: FindAuthDto) {}
 
   // refresh token
   refreshToken() {}
@@ -74,22 +92,59 @@ export class AuthService {
     return `This action removes a #${id} auth`;
   }
 
+  /**
+   * find user
+   * @param findAuthDto Dto has the user info
+   * @returns user or throw forbidden exception
+   */
   async findUser(findAuthDto: FindAuthDto): Promise<object> {
+    // get the username and email
     const { username, email } = findAuthDto;
 
-    return this.prismaService.user.findFirst({
+    // check if the user is exist in the database using email or username
+    const user = await this.prismaService.user.findFirst({
       where: {
         OR: [{ username }, { email }],
       },
     });
+
+    // if user is does not exist it will throw forbidden exception
+    if (!user) throw new ForbiddenException('Access Denied');
+    return user;
   }
 
-  // generate hash password
+  /**
+   *
+   * @param data data that will hashed
+   * @returns new hashed data
+   */
   hashData(data: string) {
     return bcrypt.hashSync(data, 10);
   }
 
-  // generate tokens
+  /**
+   *
+   * @param loginPassword password from findAuthDto which is normal(not hashed)
+   * @param userPassword hashed password from database
+   * @returns true if password is match or throw forbidden exception
+   */
+  hashCompare(loginPassword: string, userPassword: string): boolean {
+    const compareMatch: boolean = bcrypt.compareSync(
+      loginPassword,
+      userPassword,
+    );
+
+    if (!compareMatch) throw new ForbiddenException('Access Denied');
+
+    return compareMatch;
+  }
+
+  /**
+   *
+   * @param userId user id from findAuthDto
+   * @param email  email from findAuthDto
+   * @returns access and refresh token
+   */
   async genTokens(userId: string, email: string): Promise<Token> {
     const [at, rt] = await Promise.all([
       // access token
@@ -99,7 +154,7 @@ export class AuthService {
           email,
         },
         {
-          secret: 'at-secret',
+          secret: process.env.JWT_ACCESS,
           expiresIn: 60 * 15,
         },
       ),
@@ -110,7 +165,7 @@ export class AuthService {
           email,
         },
         {
-          secret: 'rt-secret', // secret that must match the same secret in the strategy
+          secret: process.env.JWT_REFRESH, // secret that must match the same secret in the strategy
           expiresIn: 60 * 60 * 24 * 7, //one week
         },
       ),
@@ -123,6 +178,11 @@ export class AuthService {
     };
   }
 
+  /**
+   *
+   * @param userId user id from findAuthDto
+   * @param rt user refresh token
+   */
   async updateRt(userId: string, rt: string) {
     const hashRefreshToken = await this.hashData(rt);
 
