@@ -7,14 +7,12 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { FindAuthDto } from './dto/find-auth.dto';
 import { Token } from './types/tokens.type';
-import { Request } from 'express';
 import { AccessTokenGuard, FreshTokenGuard } from './common/guards';
 import { GetCurrentUser } from './common/decorators';
 
