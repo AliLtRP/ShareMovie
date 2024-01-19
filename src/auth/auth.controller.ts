@@ -14,9 +14,9 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { FindAuthDto } from './dto/find-auth.dto';
 import { Token } from './types/tokens.type';
-import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { AccessTokenGuard, FreshTokenGuard } from './common/guards';
+import { GetCurrentUser } from './common/decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -33,18 +33,25 @@ export class AuthController {
     return this.authService.login(findAuthDto);
   }
 
+  /**
+   *
+   * @GetCurrentUser it is a custom decorator that return user id
+   * @param userId
+   * @returns
+   */
   @UseGuards(AccessTokenGuard)
   @Post('logout')
-  logout(@Req() req: Request) {
-    const user = req.user;
-    return this.authService.logout(user['sub']);
+  logout(@GetCurrentUser('sub') userId: string) {
+    return this.authService.logout(userId);
   }
 
   @UseGuards(FreshTokenGuard)
   @Post('refresh')
-  refreshToken(@Req() req: Request) {
-    const user = req.user;
-    return this.authService.refreshToken(user['sub'], user['refreshToken']);
+  refreshToken(
+    @GetCurrentUser('sub') userId: string,
+    @GetCurrentUser('refreshToken') refreshToken: string,
+  ) {
+    return this.authService.refreshToken(userId, refreshToken);
   }
 
   @Get()
