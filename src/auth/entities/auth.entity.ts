@@ -18,4 +18,6 @@ export class AuthEntity implements UserModel {
 
   @IsNotEmpty()
   password: string;
+
+  hashedRt: string;
 }

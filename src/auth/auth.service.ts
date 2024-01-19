@@ -23,8 +23,11 @@ export class AuthService {
       data: createAuthDto,
     });
 
+    // generate tokens
     const tokens = await this.genTokens(newUser.id, newUser.email);
 
+    // include token to the user model in the db
+    await this.updateRt(newUser.id, tokens.refresh_token);
     return tokens;
   }
 
@@ -118,5 +121,19 @@ export class AuthService {
       access_token: at,
       refresh_token: rt,
     };
+  }
+
+  async updateRt(userId: string, rt: string) {
+    const hashRefreshToken = await this.hashData(rt);
+
+    // include the hashed refresh token to user model
+    const updateUser = await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hashedRt: hashRefreshToken,
+      },
+    });
   }
 }
