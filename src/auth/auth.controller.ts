@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -14,6 +15,7 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { FindAuthDto } from './dto/find-auth.dto';
 import { Token } from './types/tokens.type';
 import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -30,11 +32,14 @@ export class AuthController {
     return this.authService.login(findAuthDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('logout')
-  logout() {
-    return this.authService.logout();
+  logout(@Req() req: Request) {
+    const user = req.user;
+    return this.authService.logout(user['id']);
   }
 
+  @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
   refreshToken() {
     return this.authService.refreshToken();
