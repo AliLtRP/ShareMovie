@@ -15,14 +15,8 @@ export class AuthService {
 
   // create user
   async create(createAuthDto: CreateAuthDto): Promise<object> {
-    const { password } = createAuthDto;
-
-    // generate salt and hashed password
-    const salt = 10;
-    const genHash = await bcrypt.hash(password, salt);
-
     // change user password with hashed password
-    createAuthDto.password = genHash;
+    createAuthDto.password = this.hashData(createAuthDto.password);
 
     return await this.prismaService.user.create({
       data: createAuthDto,
@@ -80,5 +74,10 @@ export class AuthService {
         OR: [{ username }, { email }],
       },
     });
+  }
+
+  // generate hash password
+  hashData(data: string) {
+    return bcrypt.hashSync(data, 10);
   }
 }
