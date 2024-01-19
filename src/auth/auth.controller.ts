@@ -33,6 +33,16 @@ export class AuthController {
     return this.authService.login(findAuthDto);
   }
 
+  @Post('logout')
+  logout() {
+    return this.authService.logout();
+  }
+
+  @Post('refresh')
+  refreshToken() {
+    return this.authService.refreshToken();
+  }
+
   @Get()
   findAll() {
     return this.authService.findAll();
