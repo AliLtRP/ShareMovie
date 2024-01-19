@@ -4,6 +4,8 @@ import { AuthController } from './auth.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 dotenv.config();
 
 @Module({
@@ -15,6 +17,11 @@ dotenv.config();
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtService],
+  providers: [
+    AuthService,
+    JwtService,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+  ],
 })
 export class AuthModule {}
