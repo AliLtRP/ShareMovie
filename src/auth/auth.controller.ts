@@ -6,21 +6,23 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { FindAuthDto } from './dto/find-auth.dto';
 import { Token } from './types/tokens.type';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async createUser(@Body() createAuthDto: CreateAuthDto): Promise<Token> {
+  createUser(@Body() createAuthDto: CreateAuthDto): Promise<Token> {
     // create new user if its not already exist
-    return await this.authService.create(createAuthDto);
+    return this.authService.create(createAuthDto);
   }
 
   @Post('login')
@@ -29,8 +31,8 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Body() findAuthDto: FindAuthDto) {
-    return this.authService.logout(findAuthDto);
+  logout() {
+    return this.authService.logout();
   }
 
   @Post('refresh')
