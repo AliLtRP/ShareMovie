@@ -36,13 +36,14 @@ export class AuthController {
   @Post('logout')
   logout(@Req() req: Request) {
     const user = req.user;
-    return this.authService.logout(user['id']);
+    return this.authService.logout(user['sub']);
   }
 
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
-  refreshToken() {
-    return this.authService.refreshToken();
+  refreshToken(@Req() req: Request) {
+    const user = req.user;
+    return this.authService.refreshToken(user['sub'], user['refreshToken']);
   }
 
   @Get()

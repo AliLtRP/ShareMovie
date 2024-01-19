@@ -11,6 +11,7 @@ import { FindAuthDto } from './dto/find-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Token } from './types/tokens.type';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -86,7 +87,25 @@ export class AuthService {
   }
 
   // refresh token
-  refreshToken() {}
+  async refreshToken(userId: string, rt: string) {
+    try {
+      const user: User = await this.prismaService.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      const compareMatch = this.hashCompare(rt, user.hashedRt);
+
+      const tokens = await this.genTokens(user.id, user.email);
+
+      // include token to the user model in the db
+      await this.updateRt(user.id, tokens.refresh_token);
+      return tokens;
+    } catch (e) {
+      throw e;
+    }
+  }
 
   findAll() {
     return `This action returns all auth`;
@@ -109,7 +128,7 @@ export class AuthService {
    * @param findAuthDto Dto has the user info
    * @returns user or throw forbidden exception
    */
-  async findUser(findAuthDto: FindAuthDto): Promise<object> {
+  async findUser(findAuthDto: FindAuthDto): Promise<User> {
     // get the username and email
     const { username, email } = findAuthDto;
 
@@ -136,15 +155,12 @@ export class AuthService {
 
   /**
    *
-   * @param loginPassword password from findAuthDto which is normal(not hashed)
-   * @param userPassword hashed password from database
+   * @param userData from findAuthDto which is normal(not hashed)
+   * @param userHash hashed info from database
    * @returns true if password is match or throw forbidden exception
    */
-  hashCompare(loginPassword: string, userPassword: string): boolean {
-    const compareMatch: boolean = bcrypt.compareSync(
-      loginPassword,
-      userPassword,
-    );
+  hashCompare(userData: string, userHash: string): boolean {
+    const compareMatch: boolean = bcrypt.compareSync(userData, userHash);
 
     if (!compareMatch) throw new ForbiddenException('Access Denied');
 
