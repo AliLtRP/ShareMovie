@@ -13,13 +13,14 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { FindAuthDto } from './dto/find-auth.dto';
+import { Token } from './types/tokens.type';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async createUser(@Body() createAuthDto: CreateAuthDto): Promise<object> {
+  async createUser(@Body() createAuthDto: CreateAuthDto): Promise<Token> {
     // create new user if its not already exist
     try {
       return await this.authService.create(createAuthDto);

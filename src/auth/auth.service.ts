@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { FindAuthDto } from './dto/find-auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { Token } from './types/tokens.type';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
   ) {}
 
   // create user
-  async create(createAuthDto: CreateAuthDto): Promise<object> {
+  async create(createAuthDto: CreateAuthDto): Promise<Token> {
     // change user password with hashed password
     createAuthDto.password = this.hashData(createAuthDto.password);
 
