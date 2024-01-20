@@ -6,10 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { FollowersService } from './followers.service';
 import { UpdateFollowerDto } from './dto/update-follower.dto';
 import { CreateFollowerDto } from './dto/create-follower.dto';
+import { AccessTokenGuard } from 'src/auth/common/guards';
+import { GetCurrentUser } from 'src/auth/common/decorators';
+import { CheckFollowerDto } from './dto/check-follower.dto';
 
 @Controller('followers')
 export class FollowersController {
@@ -20,9 +24,14 @@ export class FollowersController {
     return this.followersService.create(createFollowerDto);
   }
 
+  // @UseGuards(AccessTokenGuard)
   @Post('follow/user')
-  followUser(@Body() createFollowerDto: CreateFollowerDto) {
-    return this.followersService.followUser(createFollowerDto);
+  followUser(
+    // @GetCurrentUser('sub') userId: string,
+    @Body('id') userId: string,
+    @Body() checkFollowerDto: CheckFollowerDto,
+  ) {
+    return this.followersService.followUser(userId, checkFollowerDto);
   }
 
   @Get()

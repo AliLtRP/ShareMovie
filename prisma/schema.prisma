@@ -22,6 +22,6 @@ model User {
 model Followers {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   followed_id         String   @unique
-  followers_id        String[] @db.ObjectId // store the id for the followers 
-  number_of_followers Int      @default(0) // number of the followers
+  followers_id        String[] @db.String // store the id for the followers 
+  number_of_followers Int      @default(0) // number of the followers 
 }
