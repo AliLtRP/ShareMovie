@@ -2,6 +2,8 @@ import { Followers as FollowersModel } from '@prisma/client';
 import { IsArray, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class FollowerEntity implements FollowersModel {
+  id: string;
+
   @IsString()
   @IsNotEmpty()
   followed_id: string;

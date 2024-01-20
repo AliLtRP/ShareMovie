@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { FollowersService } from './followers.service';
-import { CreateFollowerDto } from './dto/create-follower.dto';
 import { UpdateFollowerDto } from './dto/update-follower.dto';
+import { CreateFollowerDto } from './dto/create-follower.dto';
 
 @Controller('followers')
 export class FollowersController {
@@ -20,14 +20,19 @@ export class FollowersController {
     return this.followersService.create(createFollowerDto);
   }
 
+  @Post('follow/user')
+  followUser(@Body() createFollowerDto: CreateFollowerDto) {
+    return this.followersService.followUser(createFollowerDto);
+  }
+
   @Get()
   findAll() {
     return this.followersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.followersService.findOne(+id);
+  findOne(@Body() createFollowerDto: CreateFollowerDto) {
+    return this.followersService.findOne(createFollowerDto);
   }
 
   @Patch(':id')
