@@ -18,3 +18,9 @@ model User {
   password String
   hashedRt String? // hashed refresh token
 }
+
+model Followers {
+  followed_id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  followers_id        String[] @db.ObjectId // store the id for the followers 
+  number_of_followers Int // number of the followers
+}
