@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
 } from '@nestjs/common';
 import { FollowersService } from './followers.service';
@@ -33,6 +32,15 @@ export class FollowersController {
     return this.followersService.followUser(userId, checkFollowerDto);
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Post('unfollow/user')
+  unFollowUser(
+    @GetCurrentUser('sub') userId: string,
+    @Body() checkFollowerDto: CheckFollowerDto,
+  ) {
+    return this.followersService.unFollowUser(userId, checkFollowerDto);
+  }
+
   @Get()
   findAll() {
     return this.followersService.findAll();
@@ -49,14 +57,5 @@ export class FollowersController {
     @Body() updateFollowerDto: UpdateFollowerDto,
   ) {
     return this.followersService.update(+id, updateFollowerDto);
-  }
-
-  @UseGuards(AccessTokenGuard)
-  @Post('unfollow/user')
-  unFollowUser(
-    @GetCurrentUser('sub') userId: string,
-    @Body() checkFollowerDto: CheckFollowerDto,
-  ) {
-    return this.followersService.unFollowUser(userId, checkFollowerDto);
   }
 }
