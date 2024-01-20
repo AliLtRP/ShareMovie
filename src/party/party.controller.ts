@@ -14,6 +14,7 @@ import { UpdatePartyDto } from './dto/update-party.dto';
 import { AccessTokenGuard } from 'src/auth/common/guards';
 import { GetCurrentUser } from 'src/auth/common/decorators';
 import { Party } from '@prisma/client';
+import { FindPartyDto } from './dto/find-party.dto';
 
 @Controller('party')
 export class PartyController {
@@ -33,9 +34,9 @@ export class PartyController {
     return this.partyService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.partyService.findOne(+id);
+  @Get('find')
+  findOne(@Body() findPartyDto: FindPartyDto) {
+    return this.partyService.findOne(findPartyDto);
   }
 
   @Patch(':id')

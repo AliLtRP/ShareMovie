@@ -3,6 +3,7 @@ import { CreatePartyDto } from './dto/create-party.dto';
 import { UpdatePartyDto } from './dto/update-party.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Party } from '@prisma/client';
+import { FindPartyDto } from './dto/find-party.dto';
 
 @Injectable()
 export class PartyService {
@@ -27,12 +28,25 @@ export class PartyService {
     }
   }
 
-  findAll() {
-    return `This action returns all party`;
+  /**
+   *
+   * @returns all parties
+   */
+  async findAll() {
+    return await this.prismaService.party.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} party`;
+  /**
+   * search for specific party using party id
+   * @param findPartyDto
+   * @returns party with specific id
+   */
+  async findOne(findPartyDto: FindPartyDto) {
+    return await this.prismaService.party.findUnique({
+      where: {
+        id: findPartyDto.id,
+      },
+    });
   }
 
   update(id: number, updatePartyDto: UpdatePartyDto) {
