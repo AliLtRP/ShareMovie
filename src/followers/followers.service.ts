@@ -50,6 +50,23 @@ export class FollowersService {
   }
 
   /**
+   * unfollow user
+   * @param userId
+   * @param checkFollowerDto
+   * @returns
+   */
+  async unFollowUser(
+    userId: string,
+    checkFollowerDto: CheckFollowerDto,
+  ): Promise<any> {
+    try {
+      return await this.decrementFollowers(userId, checkFollowerDto);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
    *
    * @returns all users in the followers table
    */
@@ -78,10 +95,6 @@ export class FollowersService {
     return `This action updates a #${id} follower`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} follower`;
-  }
-
   /**
    *
    * @param userId this is the follower id
@@ -96,14 +109,43 @@ export class FollowersService {
       const user: FollowerEntity = await this.findOne(checkFollowerDto);
 
       // push user to followers string[]
-      user.followers_id.push(userId);
+      const arrLength: number = user.followers_id.push(userId);
 
       // update the user
       return await this.prismaService.followers.update({
         where: { followed_id: user.followed_id },
         data: {
           followers_id: user.followers_id,
-          number_of_followers: user.number_of_followers + 1,
+          number_of_followers: arrLength,
+        },
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * decrement user followers number
+   * @param userId
+   * @param checkFollowerDto
+   * @returns
+   */
+  async decrementFollowers(
+    userId: string,
+    checkFollowerDto: CheckFollowerDto,
+  ): Promise<Followers> {
+    try {
+      const user: FollowerEntity = await this.findOne(checkFollowerDto);
+
+      // filter out the unfollower
+      const arr = user.followers_id.filter((v) => v != userId);
+
+      // update the user
+      return await this.prismaService.followers.update({
+        where: { followed_id: user.followed_id },
+        data: {
+          followers_id: arr,
+          number_of_followers: arr.length,
         },
       });
     } catch (e) {

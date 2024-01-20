@@ -51,8 +51,12 @@ export class FollowersController {
     return this.followersService.update(+id, updateFollowerDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.followersService.remove(+id);
+  @UseGuards(AccessTokenGuard)
+  @Post('unfollow/user')
+  unFollowUser(
+    @GetCurrentUser('sub') userId: string,
+    @Body() checkFollowerDto: CheckFollowerDto,
+  ) {
+    return this.followersService.unFollowUser(userId, checkFollowerDto);
   }
 }

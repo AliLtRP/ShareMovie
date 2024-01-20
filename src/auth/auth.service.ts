@@ -36,6 +36,7 @@ export class AuthService {
         data: createAuthDto,
       });
 
+      // add the user to the followe model
       this.followerService.create(newUser.id);
 
       // generate tokens
