@@ -12,12 +12,14 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Token } from './types/tokens.type';
 import { User } from '@prisma/client';
+import { FollowersService } from 'src/followers/followers.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly followerService: FollowersService,
   ) {}
 
   /**
@@ -33,6 +35,8 @@ export class AuthService {
       const newUser = await this.prismaService.user.create({
         data: createAuthDto,
       });
+
+      this.followerService.create(newUser.id);
 
       // generate tokens
       const tokens = await this.genTokens(newUser.id, newUser.email);

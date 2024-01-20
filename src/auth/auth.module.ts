@@ -6,6 +6,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { FollowersService } from 'src/followers/followers.service';
 dotenv.config();
 
 @Module({
@@ -16,6 +17,7 @@ dotenv.config();
     JwtService,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    FollowersService,
   ],
 })
 export class AuthModule {}

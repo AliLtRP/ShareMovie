@@ -15,10 +15,10 @@ export class FollowersService {
    * @param createFollowerDto dto that has user info
    * @returns user or throw exception bad request
    */
-  async create(createFollowerDto: CreateFollowerDto): Promise<Followers> {
+  async create(id: string): Promise<Followers> {
     try {
       const user = await this.prismaService.followers.create({
-        data: { followed_id: createFollowerDto.followed_id },
+        data: { followed_id: id },
       });
 
       return user;

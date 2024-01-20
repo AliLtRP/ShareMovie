@@ -20,15 +20,14 @@ export class FollowersController {
   constructor(private readonly followersService: FollowersService) {}
 
   @Post()
-  create(@Body() createFollowerDto: CreateFollowerDto) {
-    return this.followersService.create(createFollowerDto);
+  create(id: string) {
+    return this.followersService.create(id);
   }
 
-  // @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Post('follow/user')
   followUser(
-    // @GetCurrentUser('sub') userId: string,
-    @Body('id') userId: string,
+    @GetCurrentUser('sub') userId: string,
     @Body() checkFollowerDto: CheckFollowerDto,
   ) {
     return this.followersService.followUser(userId, checkFollowerDto);
