@@ -1,4 +1,7 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreatePartyDto } from './create-party.dto';
+import { PickType } from '@nestjs/swagger';
+import { PartyEntity } from '../entities/party.entity';
 
-export class UpdatePartyDto extends PartialType(CreatePartyDto) {}
+export class UpdatePartyDto extends PickType(PartyEntity, [
+  'id',
+  'party_name',
+]) {}

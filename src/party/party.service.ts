@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreatePartyDto } from './dto/create-party.dto';
 import { UpdatePartyDto } from './dto/update-party.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -32,7 +37,7 @@ export class PartyService {
    *
    * @returns all parties
    */
-  async findAll() {
+  async findAll(): Promise<Party[]> {
     return await this.prismaService.party.findMany();
   }
 
@@ -41,19 +46,75 @@ export class PartyService {
    * @param findPartyDto
    * @returns party with specific id
    */
-  async findOne(findPartyDto: FindPartyDto) {
-    return await this.prismaService.party.findUnique({
-      where: {
-        id: findPartyDto.id,
-      },
-    });
+  async findOne(findPartyDto: FindPartyDto): Promise<Party> {
+    try {
+      return await this.prismaService.party.findUnique({
+        where: {
+          id: findPartyDto.id,
+        },
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  update(id: number, updatePartyDto: UpdatePartyDto) {
-    return `This action updates a #${id} party`;
+  /**
+   *
+   * @param userId
+   * @param updatePartyDto
+   * @returns
+   */
+  async update(userId: string, updatePartyDto: UpdatePartyDto): Promise<Party> {
+    try {
+      const isBelong = await this.isBelongToUser(userId, updatePartyDto);
+
+      return await this.prismaService.party.update({
+        where: {
+          id: isBelong.id,
+        },
+        data: {
+          party_name: updatePartyDto.party_name,
+        },
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} party`;
+  /**
+   * delete party if belong to
+   * @param userId
+   * @param findPartyDto
+   * @returns
+   */
+  async remove(userId: string, findPartyDto: FindPartyDto): Promise<Party> {
+    try {
+      const isBelong = await this.isBelongToUser(userId, findPartyDto);
+
+      return await this.prismaService.party.delete({
+        where: {
+          id: isBelong.id,
+        },
+      });
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  /**
+   * check if the party is belong to the admin
+   * @param userId
+   * @param findPartyDto
+   * @returns party or throw forbidden exception
+   */
+  async isBelongToUser(userId: string, findPartyDto: FindPartyDto) {
+    const isBelong = await this.findOne(findPartyDto);
+
+    if (isBelong.admin !== userId)
+      throw new ForbiddenException(
+        `this party does not belong to user: ${userId}`,
+      );
+
+    return isBelong;
   }
 }

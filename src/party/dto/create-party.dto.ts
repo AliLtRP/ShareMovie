@@ -1,7 +1,7 @@
 import { OmitType } from '@nestjs/mapped-types';
-import { Party } from '../entities/party.entity';
+import { PartyEntity } from '../entities/party.entity';
 
-export class CreatePartyDto extends OmitType(Party, [
+export class CreatePartyDto extends OmitType(PartyEntity, [
   'id',
   'admin',
   'create_At',

@@ -30,22 +30,30 @@ export class PartyController {
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Party[]> {
     return this.partyService.findAll();
   }
 
   @Get('find')
-  findOne(@Body() findPartyDto: FindPartyDto) {
+  findOne(@Body() findPartyDto: FindPartyDto): Promise<Party> {
     return this.partyService.findOne(findPartyDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePartyDto: UpdatePartyDto) {
-    return this.partyService.update(+id, updatePartyDto);
+  @UseGuards(AccessTokenGuard)
+  @Patch('update')
+  update(
+    @GetCurrentUser('sub') userId: string,
+    @Body() updatePartyDto: UpdatePartyDto,
+  ): Promise<Party> {
+    return this.partyService.update(userId, updatePartyDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.partyService.remove(+id);
+  @UseGuards(AccessTokenGuard)
+  @Delete('delete')
+  remove(
+    @GetCurrentUser('sub') userId: string,
+    @Body() findPartyDto: FindPartyDto,
+  ): Promise<Party> {
+    return this.partyService.remove(userId, findPartyDto);
   }
 }

@@ -1,7 +1,7 @@
 import { Party as PartyModel } from '@prisma/client';
 import { IsDate, IsNotEmpty, IsString } from 'class-validator';
 
-export class Party implements PartyModel {
+export class PartyEntity implements PartyModel {
   id: string;
 
   @IsString()
