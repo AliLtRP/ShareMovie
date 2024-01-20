@@ -55,7 +55,7 @@ export class AuthService {
       const getUser: any = await this.findUser(findAuthDto);
 
       // if the user exist, it will compare the hashed password in the database with the user password
-      const compareMatch = this.hashCompare(
+      const compareMatch: boolean = this.hashCompare(
         findAuthDto.password,
         getUser.password,
       );
@@ -95,7 +95,7 @@ export class AuthService {
         },
       });
 
-      const compareMatch = this.hashCompare(rt, user.hashedRt);
+      const compareMatch: boolean = this.hashCompare(rt, user.hashedRt);
 
       const tokens = await this.genTokens(user.id, user.email);
 
@@ -145,7 +145,12 @@ export class AuthService {
     });
   }
 
-  async remove(id: string): Promise<any> {
+  /**
+   *
+   * @param id search for user by id
+   * @returns
+   */
+  async remove(id: string): Promise<User> {
     return await this.prismaService.user.delete({
       where: { id: id },
     });

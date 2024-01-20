@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
   UseGuards,
 } from '@nestjs/common';
@@ -85,12 +84,12 @@ export class AuthController {
 
   /**
    *
-   * @param id
-   * @returns
+   * @param id search for user using id
+   * @returns deleted user
    */
   @UseGuards(AccessTokenGuard)
   @Delete('delete/user')
-  remove(@GetCurrentUser('sub') id: string) {
+  remove(@GetCurrentUser('sub') id: string): Promise<User> {
     return this.authService.remove(id);
   }
 }
