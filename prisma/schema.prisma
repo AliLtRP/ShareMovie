@@ -25,3 +25,10 @@ model Followers {
   followers_id        String[] @db.String // store the id for the followers 
   number_of_followers Int      @default(0) // number of the followers 
 }
+
+model Party {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  admin      String   @db.ObjectId
+  party_name String
+  create_At  DateTime @default(now())
+}
