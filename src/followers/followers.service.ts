@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFollowerDto } from './dto/create-follower.dto';
 import { UpdateFollowerDto } from './dto/update-follower.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Followers } from '@prisma/client';
 
 @Injectable()
 export class FollowersService {
-  create(createFollowerDto: CreateFollowerDto) {
-    return 'This action adds a new follower';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(createFollowerDto: CreateFollowerDto): Promise<Followers> {
+    return await this.prismaService.followers.create({
+      data: createFollowerDto,
+    });
   }
 
   findAll() {
