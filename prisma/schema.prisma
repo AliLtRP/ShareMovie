@@ -38,3 +38,10 @@ model PartyViewers {
   party_id String   @unique @db.ObjectId
   user_id  String[] @db.ObjectId
 }
+
+model PartyVideo {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  uploadedUser String  @db.ObjectId
+  title        String
+  description  String?
+}
