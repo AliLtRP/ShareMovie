@@ -9,10 +9,14 @@ import { UpdatePartyDto } from './dto/update-party.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Party } from '@prisma/client';
 import { FindPartyDto } from './dto/find-party.dto';
+import { PartyViewersService } from 'src/party-viewers/party-viewers.service';
 
 @Injectable()
 export class PartyService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly partyViewerService: PartyViewersService,
+  ) {}
 
   /**
    *
@@ -22,12 +26,16 @@ export class PartyService {
    */
   async create(userId: string, createPartyDto: CreatePartyDto): Promise<Party> {
     try {
-      return await this.prismaService.party.create({
+      const party = await this.prismaService.party.create({
         data: {
           admin: userId,
           ...createPartyDto,
         },
       });
+
+      this.partyViewerService.create(party.id, party.admin);
+
+      return party;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }

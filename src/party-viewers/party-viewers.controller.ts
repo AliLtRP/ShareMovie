@@ -1,15 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { PartyViewersService } from './party-viewers.service';
-import { CreatePartyViewerDto } from './dto/create-party-viewer.dto';
-import { UpdatePartyViewerDto } from './dto/update-party-viewer.dto';
+import { AccessTokenGuard } from 'src/auth/common/guards';
+import { GetCurrentUser } from 'src/auth/common/decorators';
 
-@Controller('party-viewers')
+@Controller('party/viewers')
 export class PartyViewersController {
   constructor(private readonly partyViewersService: PartyViewersService) {}
 
   @Post()
-  create(@Body() createPartyViewerDto: CreatePartyViewerDto) {
-    return this.partyViewersService.create(createPartyViewerDto);
+  create(@Body() userId: string, partyId: string) {
+    return this.partyViewersService.create(partyId, userId);
   }
 
   @Get()
@@ -19,12 +28,16 @@ export class PartyViewersController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.partyViewersService.findOne(+id);
+    return this.partyViewersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePartyViewerDto: UpdatePartyViewerDto) {
-    return this.partyViewersService.update(+id, updatePartyViewerDto);
+  @UseGuards(AccessTokenGuard)
+  @Patch('update')
+  update(
+    @GetCurrentUser('sub') userId: string,
+    @Body('partyId') partyId: string,
+  ) {
+    return this.partyViewersService.update(userId, partyId);
   }
 
   @Delete(':id')

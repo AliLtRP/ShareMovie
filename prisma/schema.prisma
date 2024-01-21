@@ -32,3 +32,9 @@ model Party {
   party_name String
   create_At  DateTime @default(now())
 }
+
+model PartyViewers {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  party_id String   @unique @db.ObjectId
+  user_id  String[] @db.ObjectId
+}
