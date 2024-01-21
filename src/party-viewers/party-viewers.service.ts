@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PartyViewers } from '@prisma/client';
 
@@ -10,7 +15,7 @@ export class PartyViewersService {
    *
    * @param partyId
    * @param userId
-   * @returns
+   * @returns created party
    */
   async create(partyId: string, userId: string): Promise<PartyViewers> {
     try {
@@ -31,20 +36,20 @@ export class PartyViewersService {
   }
 
   /**
-   *
+   * to find party and if there is no party with this partyId prisma will return null
    * @param partyId
-   * @returns user or throw error
+   * @returns party viewer
    */
   async findOne(partyId: string): Promise<PartyViewers> {
-    try {
-      return await this.prismaService.partyViewers.findFirst({
-        where: {
-          party_id: partyId,
-        },
-      });
-    } catch (e) {
-      throw new HttpException(e.message, HttpStatus.NOT_FOUND);
-    }
+    const partyViewer = await this.prismaService.partyViewers.findFirst({
+      where: {
+        party_id: partyId,
+      },
+    });
+
+    if (!partyViewer) throw new NotFoundException('party not found');
+
+    return partyViewer;
   }
 
   /**
@@ -89,7 +94,33 @@ export class PartyViewersService {
     return usersList.includes(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} partyViewer`;
+  /**
+   * remove user forom watching partys
+   * @param userId
+   * @param partyId
+   * @returns watching party
+   */
+  async remove(userId: string, partyId: string): Promise<PartyViewers> {
+    try {
+      const isUserWatching = await this.findOne(partyId);
+
+      if (!this.isWatching(isUserWatching.user_id, userId))
+        throw new HttpException('user not watching', HttpStatus.BAD_REQUEST);
+
+      const newUsersList: Array<string> = isUserWatching.user_id.filter(
+        (v) => v != userId,
+      );
+
+      return await this.prismaService.partyViewers.update({
+        where: {
+          party_id: isUserWatching.party_id,
+        },
+        data: {
+          user_id: newUsersList,
+        },
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 }

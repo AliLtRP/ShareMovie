@@ -41,8 +41,12 @@ export class PartyViewersController {
     return this.partyViewersService.update(userId, partyId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.partyViewersService.remove(+id);
+  @UseGuards(AccessTokenGuard)
+  @Delete('delete')
+  remove(
+    @GetCurrentUser('sub') userId: string,
+    @Body('partyId') partyId: string,
+  ) {
+    return this.partyViewersService.remove(userId, partyId);
   }
 }
