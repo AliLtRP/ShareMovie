@@ -11,24 +11,25 @@ import {
 import { PartyViewersService } from './party-viewers.service';
 import { AccessTokenGuard } from 'src/auth/common/guards';
 import { GetCurrentUser } from 'src/auth/common/decorators';
+import { PartyViewers } from '@prisma/client';
 
 @Controller('party/viewers')
 export class PartyViewersController {
   constructor(private readonly partyViewersService: PartyViewersService) {}
 
   @Post()
-  create(@Body() userId: string, partyId: string) {
+  create(@Body() userId: string, partyId: string): Promise<PartyViewers> {
     return this.partyViewersService.create(partyId, userId);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<PartyViewers[]> {
     return this.partyViewersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.partyViewersService.findOne(id);
+  findOne(@Body('partyId') partyId: string): Promise<PartyViewers> {
+    return this.partyViewersService.findOne(partyId);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -36,7 +37,7 @@ export class PartyViewersController {
   update(
     @GetCurrentUser('sub') userId: string,
     @Body('partyId') partyId: string,
-  ) {
+  ): Promise<PartyViewers> {
     return this.partyViewersService.update(userId, partyId);
   }
 
