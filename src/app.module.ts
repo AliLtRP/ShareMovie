@@ -4,9 +4,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { FollowersModule } from './followers/followers.module';
 import { PartyModule } from './party/party.module';
 import { PartyViewersModule } from './party-viewers/party-viewers.module';
+import { PartyVideoModule } from './party-video/party-video.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, FollowersModule, PartyModule, PartyViewersModule],
+  imports: [AuthModule, PrismaModule, FollowersModule, PartyModule, PartyViewersModule, PartyVideoModule],
   controllers: [],
   providers: [],
 })
