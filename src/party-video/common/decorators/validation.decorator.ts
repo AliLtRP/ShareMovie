@@ -1,7 +1,7 @@
 import {
-  IsEmpty,
-  IsString,
   ValidationOptions,
+  isNotEmpty,
+  isString,
   registerDecorator,
 } from 'class-validator';
 
@@ -13,8 +13,8 @@ export function IsNotEmptyAndString(validationOption?: ValidationOptions) {
       propertyName: name,
       options: validationOption,
       validator: {
-        validate(value): boolean {
-          return IsEmpty(value) && IsString(value) ? true : false;
+        validate(value: any): boolean {
+          return isNotEmpty(value) && isString(value);
         },
         defaultMessage() {
           return `${name} must be not empty and a string`;

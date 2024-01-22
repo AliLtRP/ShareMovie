@@ -1,11 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreatePartyVideoDto } from './dto/create-party-video.dto';
 import { UpdatePartyVideoDto } from './dto/update-party-video.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PartyVideoService {
-  create(createPartyVideoDto: CreatePartyVideoDto) {
-    return 'This action adds a new partyVideo';
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async create(userId: string, createPartyVideoDto: CreatePartyVideoDto) {
+    try {
+      const addVideoParty = await this.prismaService.partyVideo.create({
+        data: {
+          uploadedUser: userId,
+          ...createPartyVideoDto,
+        },
+      });
+
+      return addVideoParty;
+    } catch (e) {
+      throw new HttpException(e.meta, HttpStatus.BAD_REQUEST);
+    }
   }
 
   findAll() {
