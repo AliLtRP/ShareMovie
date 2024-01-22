@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PartyVideoService } from './party-video.service';
 import { CreatePartyVideoDto } from './dto/create-party-video.dto';
 import { UpdatePartyVideoDto } from './dto/update-party-video.dto';
@@ -23,7 +31,10 @@ export class PartyVideoController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePartyVideoDto: UpdatePartyVideoDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePartyVideoDto: UpdatePartyVideoDto,
+  ) {
     return this.partyVideoService.update(+id, updatePartyVideoDto);
   }
 
