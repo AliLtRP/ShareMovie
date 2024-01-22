@@ -78,4 +78,12 @@ export class PartyVideoService {
       throw new HttpException(e.meta, HttpStatus.BAD_REQUEST);
     }
   }
+
+  upload(file: Express.Multer.File) {
+    console.log(file);
+    return {
+      message: 'File uploaded successfully',
+      fileInfo: file,
+    };
+  }
 }

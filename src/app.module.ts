@@ -7,7 +7,14 @@ import { PartyViewersModule } from './party-viewers/party-viewers.module';
 import { PartyVideoModule } from './party-video/party-video.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, FollowersModule, PartyModule, PartyViewersModule, PartyVideoModule],
+  imports: [
+    AuthModule,
+    PrismaModule,
+    FollowersModule,
+    PartyModule,
+    PartyViewersModule,
+    PartyVideoModule,
+  ],
   controllers: [],
   providers: [],
 })
