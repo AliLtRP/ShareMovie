@@ -27,26 +27,30 @@ export class PartyVideoController {
     return this.partyVideoService.create(userId, createPartyVideoDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get()
   findAll() {
     return this.partyVideoService.findAll();
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.partyVideoService.findOne(+id);
+    return this.partyVideoService.findOne(id);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updatePartyVideoDto: UpdatePartyVideoDto,
   ) {
-    return this.partyVideoService.update(+id, updatePartyVideoDto);
+    return this.partyVideoService.update(id, updatePartyVideoDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.partyVideoService.remove(+id);
+    return this.partyVideoService.remove(id);
   }
 }

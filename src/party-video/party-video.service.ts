@@ -2,12 +2,22 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreatePartyVideoDto } from './dto/create-party-video.dto';
 import { UpdatePartyVideoDto } from './dto/update-party-video.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PartyVideo } from '@prisma/client';
 
 @Injectable()
 export class PartyVideoService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(userId: string, createPartyVideoDto: CreatePartyVideoDto) {
+  /**
+   *
+   * @param userId
+   * @param createPartyVideoDto
+   * @returns created user
+   */
+  async create(
+    userId: string,
+    createPartyVideoDto: CreatePartyVideoDto,
+  ): Promise<PartyVideo> {
     try {
       const addVideoParty = await this.prismaService.partyVideo.create({
         data: {
@@ -22,19 +32,50 @@ export class PartyVideoService {
     }
   }
 
-  findAll() {
-    return `This action returns all partyVideo`;
+  async findAll() {
+    try {
+      return await this.prismaService.partyVideo.findMany();
+    } catch (e) {
+      throw new HttpException(e.meta, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} partyVideo`;
+  async findOne(id: string) {
+    try {
+      return await this.prismaService.partyVideo.findUnique({
+        where: {
+          id: id,
+        },
+      });
+    } catch (e) {
+      throw new HttpException(e.meta, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  update(id: number, updatePartyVideoDto: UpdatePartyVideoDto) {
-    return `This action updates a #${id} partyVideo`;
+  async update(id: string, updatePartyVideoDto: UpdatePartyVideoDto) {
+    try {
+      const updateVideo = await this.prismaService.partyVideo.update({
+        where: {
+          id: id,
+        },
+        data: updatePartyVideoDto,
+      });
+
+      return updateVideo;
+    } catch (e) {
+      throw new HttpException(e.meta, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} partyVideo`;
+  async remove(id: string) {
+    try {
+      return await this.prismaService.partyVideo.delete({
+        where: {
+          id: id,
+        },
+      });
+    } catch (e) {
+      throw new HttpException(e.meta, HttpStatus.BAD_REQUEST);
+    }
   }
 }
