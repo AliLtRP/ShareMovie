@@ -5,6 +5,7 @@ import { FollowersModule } from './followers/followers.module';
 import { PartyModule } from './party/party.module';
 import { PartyViewersModule } from './party-viewers/party-viewers.module';
 import { PartyVideoModule } from './party-video/party-video.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PartyVideoModule } from './party-video/party-video.module';
     PartyModule,
     PartyViewersModule,
     PartyVideoModule,
+    MessagesModule,
   ],
   controllers: [],
   providers: [],
