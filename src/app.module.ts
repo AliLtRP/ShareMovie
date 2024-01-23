@@ -6,6 +6,7 @@ import { PartyModule } from './party/party.module';
 import { PartyViewersModule } from './party-viewers/party-viewers.module';
 import { PartyVideoModule } from './party-video/party-video.module';
 import { MessagesModule } from './messages/messages.module';
+import { MsGateway } from './ms/ms.gateway';
 
 @Module({
   imports: [
@@ -15,9 +16,8 @@ import { MessagesModule } from './messages/messages.module';
     PartyModule,
     PartyViewersModule,
     PartyVideoModule,
-    MessagesModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [MsGateway],
 })
 export class AppModule {}
