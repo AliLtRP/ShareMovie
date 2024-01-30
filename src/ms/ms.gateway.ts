@@ -5,7 +5,6 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-// import { Server } from 'http';
 import * as fs from 'fs';
 import { join } from 'path';
 
@@ -24,7 +23,7 @@ export class MsGateway {
   private readonly chunkSize = 1024 * 1024;
 
   @SubscribeMessage('startVideo')
-  startVideoBroadcast(@MessageBody() data: any, client: Socket) {
+  startVideoBroadcast(@MessageBody() data: any) {
     console.log(data);
     this.server.emit('videoTime', data);
   }
@@ -36,7 +35,7 @@ export class MsGateway {
       '..',
       '..',
       'storage',
-      'video-1706050201132-675629205.mp4',
+      'video-1706576703509-367124588.mp4',
     );
 
     console.log(path);
@@ -49,7 +48,7 @@ export class MsGateway {
 
       for (let i = 0; i < data.length; i += this.chunkSize) {
         const chunk = data.slice(i, i + this.chunkSize);
-        client.emit('videoChunk', {
+        client.broadcast.emit('videoChunk', {
           chunk,
           isFinal: i + this.chunkSize >= data.length,
         });
