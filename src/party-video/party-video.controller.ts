@@ -32,7 +32,7 @@ export class PartyVideoController {
     return this.partyVideoService.create(userId, createPartyVideoDto);
   }
 
-  @UseGuards(AccessTokenGuard)
+  // @UseGuards(AccessTokenGuard)
   @Get()
   findAll() {
     return this.partyVideoService.findAll();

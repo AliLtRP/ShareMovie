@@ -13,6 +13,7 @@ import * as bcrypt from 'bcrypt';
 import { Token } from './types/tokens.type';
 import { User } from '@prisma/client';
 import { FollowersService } from 'src/followers/followers.service';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -173,12 +174,16 @@ export class AuthService {
     // check if the user is exist in the database using email or username
     const user = await this.prismaService.user.findFirst({
       where: {
-        OR: [{ username }, { email }],
+        OR: [
+          { username: username || undefined },
+          { email: email || undefined },
+        ],
       },
     });
 
     // if user is does not exist it will throw forbidden exception
-    if (!user) throw new ForbiddenException('Access Denied');
+    if (isEmpty(user)) throw new ForbiddenException('Access Denied');
+
     return user;
   }
 
